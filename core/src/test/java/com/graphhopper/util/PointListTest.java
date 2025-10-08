@@ -16,6 +16,8 @@
  *  limitations under the License.
  */
 package com.graphhopper.util;
+import org.junit.jupiter.api.Disabled;
+import com.github.javafaker.Faker;
 
 import com.graphhopper.util.shapes.GHPoint;
 import org.junit.jupiter.api.Test;
@@ -244,4 +246,158 @@ public class PointListTest {
         oneLength.add(0, 0, 0);
         assertEquals(2, oneLength.toLineString(false).getNumPoints());
     }
+
+    /**
+     * Nom du test: testAdd2DPointTo3DListThrowsException
+     * Intention: Vérifier que l'ajout d'un point sans altitude (2D) à une liste configurée en 3D
+     *            provoque une IllegalStateException.
+     * Motivation des données: C'est un cas d'utilisation incorrect. Le code contient une garde
+     *                        explicite ("throw new IllegalStateException(...)") pour ce scénario,
+     *                        qu'il est essentiel de valider.
+     * Oracle: Le système doit lever une exception de type IllegalStateException.
+     */
+    @Test
+    @Disabled
+    public void testAdd2DPointTo3DListThrowsException() {
+        PointList instance = new PointList(10, true); // is3D = true
+        assertThrows(IllegalStateException.class, () -> {
+            instance.add(10.0, 20.0);
+        });
+    }
+
+    /**
+     * Nom du test: testGetElevationOn2DListReturnsNaN
+     * Intention: S'assurer que l'appel de getEle() sur une liste 2D retourne Double.NaN,
+     *            conformément à la logique interne de la méthode.
+     * Motivation des données: Les listes 2D n'ont pas de données d'élévation. Le code spécifie
+     *                        un retour de Double.NaN dans ce cas, ce qui est un comportement
+     *                        contractuel à vérifier.
+     * Oracle: La valeur retournée doit être Double.NaN.
+     */
+    @Test
+    @Disabled
+    public void testGetElevationOn2DListReturnsNaN() {
+        PointList instance = new PointList(10, false); // is3D = false
+        instance.add(10.0, 20.0);
+        assertTrue(Double.isNaN(instance.getEle(0)));
+    }
+
+    /**
+     * Nom du test: testInternalCapacityIncrease
+     * Intention: Valider que la capacité interne du tableau de la PointList augmente
+     *            correctement lorsqu'on ajoute plus d'éléments que sa capacité initiale.
+     * Motivation des données: On part d'une capacité initiale de 2. En ajoutant un 3ème point,
+     *                        la logique de `incCap` (cap = newSize * 2) doit être déclenchée.
+     *                        La nouvelle capacité attendue est 3 * 2 = 6.
+     * Oracle: La capacité interne, obtenue via la méthode getCapacity(), doit être 6 après l'ajout.
+     */
+    @Test
+    @Disabled
+    public void testInternalCapacityIncrease() {
+        PointList instance = new PointList(2, false);
+        assertEquals(2, instance.getCapacity());
+        instance.add(1, 1);
+        instance.add(2, 2);
+        // Le 3ème ajout doit déclencher l'augmentation de capacité
+        instance.add(3, 3);
+        assertTrue(instance.getCapacity() >= 6, "La capacité aurait dû augmenter.");
+    }
+
+    /**
+     * Nom du test: testModificationAfterMakeImmutable
+     * Intention: Confirmer que toute tentative de modification (ex: clear()) sur une PointList
+     *            après un appel à makeImmutable() lève une IllegalStateException.
+     * Motivation des données: C'est une transition d'état critique. Le test garantit que
+     *                        l'immutabilité, une fois définie, est bien respectée.
+     * Oracle: Un appel à clear() doit lever une IllegalStateException.
+     */
+    @Test
+    @Disabled
+    public void testModificationAfterMakeImmutable() {
+        PointList instance = Helper.createPointList(1, 1, 2, 2);
+        instance.makeImmutable();
+        assertThrows(IllegalStateException.class, instance::clear);
+    }
+
+    /**
+     * Nom du test: testEqualsWithDifferentDimension
+     * Intention: Vérifier que deux listes avec les mêmes points mais des états 3D différents ne
+     *            sont pas considérées comme égales.
+     * Motivation des données: La dimensionnalité (2D vs 3D) est une propriété fondamentale de
+     *                        l'objet. La méthode equals() a un check `this.is3D() != other.is3D()`
+     *                        qui est testé ici.
+     * Oracle: La méthode equals() doit retourner false.
+     */
+    @Test
+    @Disabled
+    public void testEqualsWithDifferentDimension() {
+        PointList instance2D = Helper.createPointList(10, 10, 20, 20);
+        PointList instance3D = new PointList();
+        instance3D.add(10, 10, 0);
+        instance3D.add(20, 20, 0);
+
+        assertNotEquals(instance2D, instance3D);
+    }
+
+
+    /**
+     * Nom du test: testTrimToSizeWithLargerSize
+     * Intention: S'assurer que l'appel à trimToSize() avec une nouvelle taille supérieure à
+     *            la taille actuelle lève une IllegalArgumentException.
+     * Motivation des données: Le code contient une garde ("throw new IllegalArgumentException(...)")
+     *                        pour empêcher une utilisation incohérente de la méthode. Ce test
+     *                        valide que cette garde fonctionne.
+     * Oracle: L'appel doit lever une IllegalArgumentException.
+     */
+    @Test
+    @Disabled
+    public void testTrimToSizeWithLargerSize() {
+        PointList instance = Helper.createPointList(1, 1, 2, 2); // size = 2
+        assertThrows(IllegalArgumentException.class, () -> {
+            instance.trimToSize(3);
+        });
+    }
+
+    /**
+     * Nom du test: testEmptySingletonImmutability
+     * Intention: Valider que la constante statique PointList.EMPTY ne peut pas être modifiée,
+     *            comme spécifié dans son implémentation (classe anonyme).
+     * Motivation des données: EMPTY est un singleton spécial. Le code surcharge ses méthodes de
+     *                        modification pour qu'elles lèvent des exceptions. Il faut tester
+     *                        ce comportement pour garantir sa robustesse.
+     * Oracle: Toute tentative de modification, comme add(), doit lever une RuntimeException.
+     */
+    @Test
+    @Disabled
+    public void testEmptySingletonImmutability() {
+        PointList emptyList = PointList.EMPTY;
+        assertEquals(0, emptyList.size());
+        assertThrows(RuntimeException.class, () -> {
+            emptyList.add(1, 1);
+        });
+    }
+
+    /**
+     * Nom du test: testAddWithFakerGeneratedData
+     * Intention: Utiliser des données générées aléatoirement pour tester la robustesse de
+     *            la méthode add() et de la structure de données interne avec un grand nombre de points.
+     * Motivation des données: L'utilisation de données aléatoires mais valides via java-faker
+     *                        permet de tester des cas que le développeur n'aurait pas imaginés,
+     *                        simulant ici l'ajout de 100 points d'un trajet plausible.
+     * Oracle: La taille finale de la liste doit correspondre au nombre de points ajoutés.
+     */
+    @Test
+    public void testAddWithFakerGeneratedData() {
+        Faker faker = new Faker();
+        PointList instance = new PointList();
+        int numberOfPoints = 100;
+
+        for (int i = 0; i < numberOfPoints; i++) {
+            double lat = Double.parseDouble(faker.address().latitude().replace(',', '.'));
+            double lon = Double.parseDouble(faker.address().longitude().replace(',', '.'));
+            instance.add(lat, lon);
+        }
+        assertEquals(numberOfPoints, instance.size());
+    }
 }
+
