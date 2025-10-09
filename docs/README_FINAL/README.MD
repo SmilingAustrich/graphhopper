@@ -134,3 +134,38 @@ Voici l'analyse technique de deux mutants que notre démarche a permis d'élimin
 Enfin, pour répondre à la dernière exigence, nous avons intégré la librairie `java-faker`. Nous l'avons utilisée pour implémenter le test [`testAddWithFakerGeneratedData()`](https://github.com/umontreal-diro/graphhopper/commit/d870d510c462c6f950469104f841d6105997189b#diff-b62c929c7227697be4e5237d3abbab2beacaaf6d0f1102b07e80fc3c4deee0b2R390). Ce test valide la robustesse de la méthode `add()` de `PointList` en la soumettant à une boucle de 100 ajouts de coordonnées géographiques valides mais aléatoires, un scénario qui se rapproche davantage d'une utilisation réelle.
 
 ---
+
+## 7. Sources et Outils Utilisés
+
+La réalisation de ce projet a reposé sur la consultation de la documentation officielle des outils, des articles de référence sur les méthodologies de test, ainsi que sur l'utilisation d'outils d'assistance au développement.
+
+### Documentation Technique
+
+*   **Pitest - Quickstart Guide** : La documentation officielle de Pitest a été notre principale source d'information pour l'intégration du plugin Maven, la configuration pour JUnit 5 et l'interprétation des rapports de mutation.
+    *   *Source : [pitest.org](https://pitest.org/quickstart/maven/)*
+
+*   **JaCoCo - Maven Plugin Documentation** : Consultée pour comprendre comment générer le rapport de couverture de code initial qui a guidé notre sélection de classes.
+    *   *Source : [eclemma.org/jacoco/trunk/doc/maven.html](https://www.eclemma.org/jacoco/trunk/doc/maven.html)*
+
+*   **JavaFaker - GitHub Repository** : La documentation sur le dépôt GitHub de la librairie a été utilisée pour comprendre comment l'intégrer en tant que dépendance Maven et comment utiliser l'API pour générer des données de test.
+    *   *Source : [github.com/DiUS/java-faker](https://github.com/DiUS/java-faker)*
+
+### Articles et Concepts Théoriques
+
+*   **"An Analysis and Survey of Mutation Testing" par Yue, Jia et Mark Harman** : Cet article académique nous a fourni une base théorique solide pour comprendre les principes du test de mutation, l'importance des opérateurs de mutation et l'interprétation des scores de mutation par rapport à la couverture de code traditionnelle.
+    *   *Source : IEEE Transactions on Software Engineering, vol. 37, no. 5, 2011.*
+
+*   **"What is White-Box Testing?" par Martin Fowler** : Les articles de Martin Fowler sur les pratiques de test nous ont inspirés pour notre stratégie de "chasse aux mutants", en particulier l'idée de concevoir des tests basés sur la connaissance de la structure interne du code (boîte blanche) pour cibler des faiblesses spécifiques.
+    *   *Source : [martinfowler.com](https://martinfowler.com/bliki/WhiteBoxTest.html)*
+
+### Assistance par Intelligence Artificielle
+
+Tout au long de ce projet, nous avons utilisé des outils d'intelligence artificielle générative, notamment ChatGPT, comme un assistant de programmation et de rédaction. Son utilisation s'est concentrée sur les aspects suivants :
+
+*   **Débogage de la configuration Maven :** L'IA nous a aidés à diagnostiquer et à résoudre des problèmes complexes de configuration du `pom.xml`, notamment les incompatibilités de versions entre les plugins Pitest et les erreurs de build liées aux profils Maven.
+*   **Génération de squelettes de code :** L'outil a été utilisé pour générer des squelettes pour les tests unitaires, que nous avons ensuite adaptés et affinés pour répondre à nos objectifs spécifiques.
+*   **Aide à la rédaction et au formatage :** Nous avons utilisé l'IA pour améliorer la clarté, la structure et le formatage Markdown de ce rapport.
+
+Il est important de noter que si l'IA a été un outil précieux pour accélérer le développement et surmonter les obstacles techniques, la stratégie de test, l'analyse des résultats de mutation et la conception finale des tests "tueurs de mutants" sont le fruit de notre propre réflexion et de notre compréhension des concepts.
+
+---
