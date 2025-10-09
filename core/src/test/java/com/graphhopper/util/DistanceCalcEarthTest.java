@@ -336,11 +336,12 @@ public class DistanceCalcEarthTest {
     /**
      * Nom du test: testCreateBBoxWithZeroRadius
      * Intention: Vérifier que la méthode createBBox lève une IllegalArgumentException
-     *            lorsqu'elle est appelée avec un rayon de zéro.
-     * Motivation des données: Un rayon de zéro ou négatif est une entrée physiquement
-     *                        invalide qui doit être rejetée. Le code contient une garde
-     *                        explicite pour ce cas qui doit être testée.
-     * Oracle: Le système doit lever une IllegalArgumentException.
+     *            lorsqu'elle est appelé avec un rayon nul.
+     * Motivation des données: Un rayon de 0 n'a aucun sens physique pour une boîte englobante
+     *                         Le test utilise ce cas pour s'assurer que la validation d'entrée
+     *                         empêche toute création invalide
+     * Oracle: Le comportement attendu est la levée d'une IllegalArgumentException, détectée par
+     *         assertThrows()
      */
     @Test
     @Disabled
@@ -353,12 +354,11 @@ public class DistanceCalcEarthTest {
 
     /**
      * Nom du test: testCalcDist3DWithSameElevation
-     * Intention: S'assurer que la distance 3D est identique à la distance 2D lorsque les
-     *            points de départ et d'arrivée ont la même altitude.
-     * Motivation des données: Ce test vérifie la branche où 'eleDelta' est zéro dans la
-     *                        formule de distance 3D. Le résultat doit correspondre
-     *                        exactement au calcul de la distance de Haversine pure.
-     * Oracle: La distance calculée par calcDist3D() doit être égale à celle de calcDist().
+     * Intention: S'assurer que calcDist3D() retourne la même valeur que calcDist()
+     *            lorsque les deux points ont la même altitude
+     * Motivation des données: Deux points ayant la même élévation ne devraient pas introduire
+     *                         de différence verticale dans le calcul 3D.
+     * Oracle: La distance 3D et la distance 2D doivent être égales, comparées par assertEquals()
      */
     @Test
     @Disabled
@@ -375,12 +375,11 @@ public class DistanceCalcEarthTest {
 
     /**
      * Nom du test: testCalcDist3DWithOneNaNElevation
-     * Intention: Valider que la méthode hasElevationDiff retourne false si l'une des deux
-     *            altitudes est NaN, ce qui devrait ramener le calcul 3D à un calcul 2D.
-     * Motivation des données: Les données manquantes (NaN) sont un cas courant. Le système
-     *                        doit gérer cela gracieusement sans planter et retourner un
-     *                        résultat sensé (la distance 2D).
-     * Oracle: La distance 3D calculée doit être égale à la distance 2D.
+     * Intention: Vérifier que la méthode calcDist3D() se comporte comme calcDist() lorsqu'une
+     *            altitude est NaN
+     * Motivation des données: Les données GPS peuvent contenir des altitudes manquantes. On
+     *                         s'assure que la méthode gère ce cas sans erreur.
+     * Oracle: La distance 3D doit être identique à la distance 2D.
      */
     @Test
     @Disabled
@@ -396,13 +395,11 @@ public class DistanceCalcEarthTest {
 
     /**
      * Nom du test: testCrossingPointOnHorizontalEdge
-     * Intention: Vérifier le comportement de calcCrossingPointToEdge pour une arête
-     *            parfaitement horizontale (même latitude).
-     * Motivation des données: C'est un cas limite qui suit une branche de code spécifique
-     *                        ("if (delta_lat == 0)"). La projection d'un point sur une ligne
-     *                        horizontale doit avoir la même latitude que la ligne.
-     * Oracle: Le point de croisement calculé doit avoir la latitude de l'arête et la
-     *         longitude du point de requête.
+     * Intention: Vérifier la projection correcte d'un point sur une arête horizontale.
+     * Motivation des données: Cas limite où la latitude est constante. Ce snénario suit une branche
+     *                         spécifique du code (delta_lat == 0)
+     * Oracle: Le point projeté doit avoir la même latitude que l'arête et la longitude du point
+     *         de requête
      */
     @Test
     @Disabled
@@ -415,13 +412,10 @@ public class DistanceCalcEarthTest {
 
     /**
      * Nom du test: testCrossingPointOnVerticalEdge
-     * Intention: Vérifier le comportement de calcCrossingPointToEdge pour une arête
-     *            parfaitement verticale (même longitude).
-     * Motivation des données: C'est le second cas limite qui suit une branche de code
-     *                        spécifique ("if (delta_lon == 0)"). La projection d'un point
-     *                        sur une ligne verticale doit avoir la même longitude que la ligne.
-     * Oracle: Le point de croisement calculé doit avoir la longitude de l'arête et la
-     *         latitude du point de requête.
+     * Intention: Vérifier la projection correcte d'un point sur une arête verticale
+     * Motivation des données: Cas limite où la longitude est constante (delta_lon == 0)
+     * Oracle: Le point projeté doit avoir la même longitude que l'arête et la latitude au point
+     *         de requête
      */
     @Test
     @Disabled
@@ -434,8 +428,7 @@ public class DistanceCalcEarthTest {
 
     /**
      * Nom du test: testIsCrossBoundaryReturnsTrue
-     * Intention: Confirmer que l'heuristique isCrossBoundary détecte correctement un
-     *            passage de l'antiméridien.
+     * Intention: Vérifier que iscrossBoundary() détecte bien un passage de l'antiméridien
      * Motivation des données: On utilise des longitudes de part et d'autre de la ligne
      *                        de changement de date (-170 et 170). La différence absolue
      *                        (340) est supérieure à 300, donc la méthode doit retourner true.
@@ -449,7 +442,7 @@ public class DistanceCalcEarthTest {
 
     /**
      * Nom du test: testIsCrossBoundaryReturnsFalse
-     * Intention: S'assurer que l'heuristique isCrossBoundary ne déclenche pas de faux
+     * Intention: S'assurer que l'heuristique isCrossBoundary ne signale pas de faux
      *            positif pour une grande distance qui ne traverse pas l'antiméridien.
      * Motivation des données: On utilise deux points très éloignés (Lisbonne et Moscou) mais
      *                        du même côté de la ligne de date. La différence de longitude est
@@ -465,32 +458,25 @@ public class DistanceCalcEarthTest {
     }
 
     /**
-     * Nom du test: testCircumferenceAtLatitude (Tueur de Mutant 1 , je l'ai add apres le test de
-     * mutation)
-     * Intention: Supprimmer un mutant qui remplace une multiplication par une division dans le
-     *            calcul de la circonférence.
-     * Motivation des données: Le test original utilisait une latitude de 0, où cos(0)=1,
-     *                        rendant la multiplication et la division par 1 indiscernables.
-     *                        En utilisant une latitude de 45 degrés, où cos(45) est différent
-     *                        de 1, la différence de résultat devient évidente.
-     * Oracle: La circonférence à 45° doit être 2*PI*R*cos(45°), une valeur connue.
+     * Nom du test : testCircumferenceAtLatitude
+     * Intention : Vérifier la formule de circonférence à une latitude donnée.
+     * Motivation des données : À 45°, cos(45°) ≠ 1, ce qui permet de détecter un
+     *                          mutant remplaçant une multiplication par une division.
+     * Oracle : La valeur attendue est 2πR·cos(45°).
      */
     @Test
     public void testCircumferenceAtLatitude() {
-        // Circonférence attendue à 45 degrés de latitude
         double expected = 2 * Math.PI * DistanceCalcEarth.R * Math.cos(Math.toRadians(45));
         assertEquals(expected, dc.calcCircumference(45), 1e-7);
     }
 
+
     /**
      * Nom du test: testCalcDist3DWithPythagoras (Tueur de Mutant 2)
-     * Intention: Supprimmer un mutant qui remplace l'addition par une soustraction dans le calcul
-     *            de la distance 3D (formule de Pythagore).
-     * Motivation des données: Nous utilisons un triangle rectangle simple et connu (3-4-5).
-     *                        Une distance horizontale de 4000m et une différence d'altitude de 3000m
-     *                        doivent donner une distance 3D de 5000m. Le mutant (sqrt(4000² - 3000²))
-     *                        donnerait un résultat incorrect.
-     * Oracle: Le résultat doit correspondre à l'hypoténuse d'un triangle 3-4-5, soit 5000m.
+     * Intention: Vérifier la cohérence du calcul 3D via le théorème de Pythagore
+     * Motivation des données: Un triangle 3-4-5 (4000m horizontaux, 3000m verticaux) permet
+     *                         de tester la bonne combinaison quadratique
+     * Oracle: La distance doit correspondre à l'hypoténuse d'un triangle 3-4-5, soit 5000m.
      */
     @Test
     public void testCalcDist3DWithPythagoras() {
