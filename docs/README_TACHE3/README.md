@@ -127,9 +127,12 @@ Voici la capture d’écran confirmant le déclenchement du Rickroll dans la CI 
 
 
 Cela valide que :
-– la détection de baisse fonctionne,  
-– la propagation du signal `drop=true` fonctionne,  
-– et notre action GitHub personnalisée est bien invoquée lorsque la qualité diminue.
+
+1. la détection de baisse fonctionne
+
+2. la propagation du signal `drop=true` fonctionne
+
+3. et notre action GitHub personnalisée est bien invoquée lorsque la qualité diminue.
 
 
 ## 3. Tests Mockés : Choix et Justification
@@ -151,6 +154,38 @@ Le choix s’est fait pour trois raisons :
 – elles sont parfaites pour illustrer l’utilité des mocks (isolation + contrôle total des entrées).
 
 ---
+
+### Organisation des fichiers de test mockés
+
+Pour isoler clairement le travail de la Tâche 3, nous avons placé nos tests mockés dans un 
+package dédié : 
+
+`core/src/test/java/com/graphhopper/ift3913/` 
+
+Les trois tests mockés sont accessibles ici :  
+➡️ [core/src/test/java/ift3913](https://github.com/SmilingAustrich/graphhopper/tree/9fbb0e1f90a4d250088c6650293c8ede0d002c51/core/src/test/java/ift3913)
+
+Cette structure respecte deux objectifs :
+
+1. **Séparer proprement notre travail du reste de la suite de tests GraphHopper.**  
+   Le projet original contient déjà des dizaines de tests répartis par module.  
+   En créant un package distinct `ift3913`, nous évitons toute collision de nom, 
+   nous ne modifions aucune classe existante et nous laissons la structure du projet intacte.
+
+2. **Rendre le travail facile à retrouver et à corriger pour le corps enseignant.**  
+   Tous les tests exigés par la Tâche 3 (mock de `PointList`, `DistanceCalcEarth`, 
+   et `EdgeIteratorState`) sont regroupés au même endroit, ce qui simplifie 
+   la révision et permet de voir immédiatement notre contribution.
+
+Les trois fichiers ajoutés sont donc visibles à cet emplacement :
+
+- `PointListMockTest.java`  
+- `DistanceCalcEarthMockTest.java`  
+- `EdgeIteratorStateMockTest.java`
+
+Ce regroupement logique permet de conserver une arborescence propre et cohérente tout en 
+respectant la structure Maven standard (`src/test/java`). 
+
 
 ### 3.1. Test mocké – `PointListMockTest`
 
@@ -305,9 +340,9 @@ Notre intégration CI et les tests mockés permettent maintenant :
 – une protection contre les régressions dans la suite de tests,  
 – une CI plus propre, mieux organisée et plus moderne.
 
-La séparation en workflows indépendants, la baseline PIT et l’action Rickroll fournissent une solution professionnelle, extensible et amusante — un équilibre qui représente bien l’esprit du cours.
+La séparation en workflows indépendants, la baseline PIT et l’action Rickroll fournissent une solution professionnelle, extensible et amusante. Un équilibre qui représente bien l’esprit du cours.
 
-Le projet peut maintenant évoluer avec une meilleure garantie de stabilité, et chaque nouvelle contribution doit maintenir ou améliorer la qualité de test — un avantage essentiel dans un projet open source comme GraphHopper.
+Le projet peut maintenant évoluer avec une meilleure garantie de stabilité et chaque nouvelle contribution doit maintenir ou améliorer la qualité de test. Clairement un avantage essentiel dans un projet open source comme GraphHopper.
 
 ---
 
