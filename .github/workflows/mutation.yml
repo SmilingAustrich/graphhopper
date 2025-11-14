@@ -45,12 +45,27 @@ jobs:
             exit 0
           fi
           
-          # PIT puts the score inside a line like: <td>Mutation Coverage</td><td>71%</td>
-          score=$(grep -oP '(?<=Mutation Coverage</td><td>).*(?=%)' "$report")
+          # Extraire la ligne contenant "Mutation Coverage"
+          line=$(grep -F "Mutation Coverage" "$report" || true)
+
+          if [ -z "$line" ]; then
+            echo "No Mutation Coverage line found."
+            echo "score=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Extraire le % avec sed
+          score=$(echo "$line" | sed -E 's/.*Mutation Coverage<\/td><td>([0-9]+)%.*/\1/')
+
+          if [ -z "$score" ]; then
+            echo "Failed to extract score."
+            echo "score=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           echo "Extracted score: $score"
           echo "score=$score" >> $GITHUB_OUTPUT
 
-      
 
       - name: Compare with previous score
         id: compare
