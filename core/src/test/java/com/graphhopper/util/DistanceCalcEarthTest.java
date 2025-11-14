@@ -39,13 +39,49 @@ public class DistanceCalcEarthTest {
         float lat = 24.235f;
         float lon = 47.234f;
 
-        // Test ultra faible : on ne vérifie rien de précis.
-        double d1 = dc.calcDist(lat, lon, lat + 0.1, lon + 0.1);
-        double d2 = dc.calcDist(lat, lon, lat - 5, lon + 3);
 
-        // On vérifie juste que les distances sont positives
-        assertTrue(d1 > 0);
-        assertTrue(d2 > 0);
+        DistanceCalc approxDist = new DistancePlaneProjection();
+        double res = 15051;
+        assertEquals(res, dc.calcDist(lat, lon, lat - 0.1, lon + 0.1), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat - 0.1, lon + 0.1), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat - 0.1, lon + 0.1), 1);
+
+        res = 15046;
+        assertEquals(res, dc.calcDist(lat, lon, lat + 0.1, lon - 0.1), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat + 0.1, lon - 0.1), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat + 0.1, lon - 0.1), 1);
+
+        res = 150748;
+        assertEquals(res, dc.calcDist(lat, lon, lat - 1, lon + 1), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat - 1, lon + 1), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat - 1, lon + 1), 10);
+
+        res = 150211;
+        assertEquals(res, dc.calcDist(lat, lon, lat + 1, lon - 1), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat + 1, lon - 1), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat + 1, lon - 1), 10);
+
+        res = 1527919;
+        assertEquals(res, dc.calcDist(lat, lon, lat - 10, lon + 10), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat - 10, lon + 10), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat - 10, lon + 10), 10000);
+
+        res = 1474016;
+        assertEquals(res, dc.calcDist(lat, lon, lat + 10, lon - 10), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat + 10, lon - 10), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat + 10, lon - 10), 10000);
+
+        res = 1013735.28;
+        assertEquals(res, dc.calcDist(lat, lon, lat, lon - 10), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat, lon - 10), 1);
+        // 1013952.659
+        assertEquals(res, approxDist.calcDist(lat, lon, lat, lon - 10), 1000);
+
+        // if we have a big distance for latitude only then PlaneProjection is exact!!
+        res = 1111949.3;
+        assertEquals(res, dc.calcDist(lat, lon, lat + 10, lon), 1);
+        assertEquals(dc.calcNormalizedDist(res), dc.calcNormalizedDist(lat, lon, lat + 10, lon), 1);
+        assertEquals(res, approxDist.calcDist(lat, lon, lat + 10, lon), 1);
     }
 
     @Test
