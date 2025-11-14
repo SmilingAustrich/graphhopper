@@ -72,10 +72,17 @@ jobs:
   rickroll:
     needs: pitest
     runs-on: ubuntu-latest
+
+    # Rickroll se déclenche si :
+    # - le job pitest fail (tests cassés)
+    # - le score diminue (drop=true)
     if: |
-      failure() ||
       needs.pitest.result == 'failure' ||
       needs.pitest.outputs.drop == 'true'
 
     steps:
-      - uses: ./.github/actions/rickroll
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Rickroll
+        uses: ./.github/actions/rickroll
