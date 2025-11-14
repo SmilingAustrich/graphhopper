@@ -1,13 +1,13 @@
-rickroll:
-  needs: pitest
-  runs-on: ubuntu-latest
-  if: needs.pitest.outputs.drop == 'true'
+name: "Rickroll"
+description: "Rickroll quand le score de mutation baisse"
 
+runs:
+  using: "composite"
   steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Rickroll
-      uses: ./.github/actions/rickroll
+    - name: Rick time
+      shell: bash
+      run: |
+        echo ""
+        echo "🎵 Never gonna give you up 🎵"
+        echo "https://youtu.be/dQw4w9WgXcQ"
+        echo ""
