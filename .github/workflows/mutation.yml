@@ -37,13 +37,17 @@ jobs:
       - name: Extract mutation score
         id: extract
         run: |
-          file=$(find core/target -name "mutations.xml" | head -n 1)
+          file=$(find core/target -type f -name "mutations.xml" | head -n 1)
+          echo "Found file: $file"
+
           if [ -z "$file" ]; then
             echo "score=0" >> $GITHUB_OUTPUT
             exit 0
           fi
+
           score=$(grep -oP '(?<=<mutationCoverage>).*(?=</mutationCoverage>)' "$file")
           echo "score=$score" >> $GITHUB_OUTPUT
+      
 
       - name: Compare with previous score
         id: compare
