@@ -2,17 +2,14 @@ name: Mutation Testing
 
 on:
   push:
-    paths:
-      - "core/**"
-      - ".github/workflows/mutation.yml"
   pull_request:
-    paths:
-      - "core/**"
-      - ".github/workflows/mutation.yml"
 
 jobs:
   pitest:
     runs-on: ubuntu-latest
+
+    outputs:
+      drop: ${{ steps.compare.outputs.drop }}
 
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +31,6 @@ jobs:
             echo "score=0" >> $GITHUB_OUTPUT
             exit 0
           fi
-
           score=$(grep -oP '(?<=<mutationCoverage>).*(?=</mutationCoverage>)' "$file")
           echo "score=$score" >> $GITHUB_OUTPUT
 
@@ -62,9 +58,11 @@ jobs:
           git add .mutation-baseline
           git commit -m "Update mutation baseline" || echo "No changes"
 
+
   rickroll:
     needs: pitest
     runs-on: ubuntu-latest
     if: needs.pitest.outputs.drop == 'true'
     steps:
-      - uses: ./.github/workflows/action.yml
+      - uses: ./.github/actions/rockroll
+
