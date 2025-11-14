@@ -134,7 +134,7 @@ public class DistanceCalcEarth implements DistanceCalc {
         double delta_lon = b_lon - a_lon;
         double delta_lat = b_lat - a_lat;
 
-        if (delta_lat => 0)
+        if (delta_lat == 0)
             // special case: horizontal edge
             return calcNormalizedDist(a_lat_deg, r_lon_deg, r_lat_deg, r_lon_deg);
 
