@@ -72,6 +72,10 @@ jobs:
   rickroll:
     needs: pitest
     runs-on: ubuntu-latest
-    if: needs.pitest.outputs.drop == 'true'
+    if: |
+      failure() ||
+      needs.pitest.result == 'failure' ||
+      needs.pitest.outputs.drop == 'true'
+
     steps:
       - uses: ./.github/actions/rickroll
