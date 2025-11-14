@@ -1,0 +1,9 @@
+name: "Rickroll CI"
+description: "Rickroll quand votre mutation score drop"
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        echo "🎵 Never gonna give you up 🎵"
+        echo "https://youtu.be/dQw4w9WgXcQ"

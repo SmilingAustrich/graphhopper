@@ -1,0 +1,70 @@
+name: Mutation Testing
+
+on:
+  push:
+    paths:
+      - "core/**"
+      - ".github/workflows/mutation.yml"
+  pull_request:
+    paths:
+      - "core/**"
+      - ".github/workflows/mutation.yml"
+
+jobs:
+  pitest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17 for PIT
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Run PIT Mutation Testing on core module only
+        run: mvn -pl core -am -DwithHistory org.pitest:pitest-maven:mutationCoverage
+
+      - name: Find mutation score
+        id: extract
+        run: |
+          file=$(find core/target -name "mutations.xml" | head -n 1)
+          if [ -z "$file" ]; then
+            echo "score=0" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          score=$(grep -oP '(?<=<mutationCoverage>).*(?=</mutationCoverage>)' "$file")
+          echo "score=$score" >> $GITHUB_OUTPUT
+
+      - name: Compare with previous score
+        id: compare
+        run: |
+          current=${{ steps.extract.outputs.score }}
+          previous=$(cat .mutation-baseline 2>/dev/null || echo 0)
+
+          echo "Previous score: $previous%"
+          echo "Current score : $current%"
+
+          if (( $(echo "$current < $previous" | bc -l) )); then
+             echo "drop=true" >> $GITHUB_OUTPUT
+          else
+             echo "drop=false" >> $GITHUB_OUTPUT
+             echo "$current" > .mutation-baseline
+          fi
+
+      - name: Commit updated mutation baseline
+        if: steps.compare.outputs.drop == 'false'
+        run: |
+          git config --local user.email "ci@example.com"
+          git config --local user.name "CI BOT"
+          git add .mutation-baseline
+          git commit -m "Update mutation baseline" || echo "No changes"
+
+  rickroll:
+    needs: pitest
+    runs-on: ubuntu-latest
+    if: needs.pitest.outputs.drop == 'true'
+    steps:
+      - uses: ./.github/workflows/action.yml
