@@ -39,8 +39,6 @@ public class DistanceCalcEarthTest {
         float lat = 24.235f;
         float lon = 47.234f;
 
-        assertTrue(false);
-
         DistanceCalc approxDist = new DistancePlaneProjection();
         double res = 15051;
         assertEquals(res, dc.calcDist(lat, lon, lat - 0.1, lon + 0.1), 1);
