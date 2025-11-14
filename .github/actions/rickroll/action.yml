@@ -10,4 +10,4 @@ rickroll:
         fetch-depth: 0
 
     - name: Rickroll
-      uses: ./.github/actions/rickroll
+      uses: ./actions/rickroll
