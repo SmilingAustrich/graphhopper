@@ -2,6 +2,12 @@ rickroll:
   needs: pitest
   runs-on: ubuntu-latest
   if: needs.pitest.outputs.drop == 'true'
+
   steps:
-    - uses: actions/checkout@v4   # ← OBLIGATOIRE !
-    - uses: ./.github/actions/rickroll
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Rickroll
+      uses: ./.github/actions/rickroll
