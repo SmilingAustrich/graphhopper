@@ -1,9 +1,7 @@
-name: "Rickroll CI"
-description: "Rickroll quand votre mutation score drop"
-
-runs:
-  using: "composite"
+rickroll:
+  needs: pitest
+  runs-on: ubuntu-latest
+  if: needs.pitest.outputs.drop == 'true'
   steps:
-    - run: |
-        echo "🎵 Never gonna give you up 🎵"
-        echo "https://youtu.be/dQw4w9WgXcQ"
+    - uses: actions/checkout@v4   # ← OBLIGATOIRE !
+    - uses: ./.github/actions/rickroll
