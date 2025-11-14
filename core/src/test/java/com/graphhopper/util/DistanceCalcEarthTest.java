@@ -35,7 +35,6 @@ public class DistanceCalcEarthTest {
     }
 
     @Test
-
     public void testDistance() {
         float lat = 24.235f;
         float lon = 47.234f;
