@@ -44,21 +44,12 @@ jobs:
             echo "score=0" >> $GITHUB_OUTPUT
             exit 0
           fi
-          
-          # Extraire la ligne contenant "Mutation Coverage"
-          line=$(grep -F "Mutation Coverage" "$report" || true)
 
-          if [ -z "$line" ]; then
-            echo "No Mutation Coverage line found."
-            echo "score=0" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          
-          # Extraire le % avec sed
-          score=$(echo "$line" | sed -E 's/.*Mutation Coverage<\/td><td>([0-9]+)%.*/\1/')
+          # Extraire le premier nombre suivi de %
+          score=$(grep -oP '[0-9]+(?=%)' -m1 "$report" || true)
 
           if [ -z "$score" ]; then
-            echo "Failed to extract score."
+            echo "No score found in HTML"
             echo "score=0" >> $GITHUB_OUTPUT
             exit 0
           fi
