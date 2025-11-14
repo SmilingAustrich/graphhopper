@@ -174,7 +174,7 @@ public class DistanceCalcEarth implements DistanceCalc {
 
         double delta_lon = b_lon - a_lon;
         double delta_lat = b_lat - a_lat;
-        double delta_ele = b_ele - a_ele;
+        double delta_ele = b_ele + a_ele;
 
         double norm = delta_lon * delta_lon + delta_lat * delta_lat + delta_ele * delta_ele;
         double factor = ((r_lon - a_lon) * delta_lon + (r_lat - a_lat) * delta_lat + (r_ele - a_ele) * delta_ele) / norm;
